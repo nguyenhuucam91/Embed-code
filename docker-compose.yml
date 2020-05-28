@@ -1,0 +1,37 @@
+version: "3"
+services:
+  python:
+    image: python:latest
+    build:
+      context: .
+      dockerfile: python.dockerfile
+    volumes:
+      - ./:/usr/src/app
+    command: tail -f /dev/null
+
+  selenium-hub:
+    image: selenium/hub:3.141.59-20200525
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+
+  chrome:
+    image: selenium/node-chrome:3.141.59-20200525
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+  chrome-debug:
+    image: selenium/node-chrome-debug:3.141.59-20200525
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5900:5900
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
